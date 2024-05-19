@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Classroom with Interactive Door and Chalkboard</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+</head>
+<body>
+  <script>
+        AFRAME.registerComponent('click-listener', {
+            init: function () {
+                this.el.addEventListener('click', (evt) => {
+                    console.log('Door clicked');
+                    if (!this.doorIsOpen) {
+                        this.el.emit('open');
+                        this.doorIsOpen = true;
+                    } else {
+                        this.el.emit('close');
+                        this.doorIsOpen = false;
+                    }
+                });
+            }
+        });
+
+        document.querySelector('#door').addEventListener('click', function () {
+            this.components['click-listener'].init(); // Initialize click listener when the door is clicked
+        });
+
+        // Additional scripts for tables and chairs
+        const sceneEl = document.querySelector('a-scene');
+        function createTableAndComputers(x, z) {
+            // Create a table
+            const table = document.createElement('a-box');
+            table.setAttribute('position', `${x} 0.75 ${z}`);
+            table.setAttribute('depth', '1');
+            table.setAttribute('height', '0.5');
+            table.setAttribute('width', '4');
+            table.setAttribute('color', '#8B4513');
+            sceneEl.appendChild(table);
+
+            // Create computers and chairs
+            for (let i = 0; i < 4; i++) {
+                const computer = document.createElement('a-box');
+                computer.setAttribute('position', `${x - 1.5 + i} 1.25 ${z}`);
+                computer.setAttribute('depth', '0.4');
+                computer.setAttribute('height', '0.2');
+                computer.setAttribute('width', '0.6');
+                computer.setAttribute('color', 'grey');
+                sceneEl.appendChild(computer);
+
+                const chair = document.createElement('a-box');
+                chair.setAttribute('position', `${x - 1.5 + i} 0.5 ${z + 0.75}`);
+                chair.setAttribute('rotation', '0 180 0');
+                chair.setAttribute('depth', '0.5');
+                chair.setAttribute('height', '0.5');
+                chair.setAttribute('width', '0.5');
+                chair.setAttribute('color', '#333333');
+                sceneEl.appendChild(chair);
+            }
+        }
+
+        // Create furniture
+        for (let i = 0; i < 4; i++) {
+            createTableAndComputers(-4, -17 - i * 3);
+            createTableAndComputers(4, -17 - i * 3);
+        }
+    </script>
+
+    <a-scene>
+        <!-- Camera with Cursor for VR interaction -->
+        <a-camera position="0 1.6 0" look-controls>
+            <a-cursor 
+                fuse="true" 
+                fuse-timeout="1500"
+                raycaster="objects: .clickable">
+            </a-cursor>
+        </a-camera>
+        
+        <!-- Sky and lighting -->
+        <a-sky color="#ECECEC"></a-sky>
+        <a-light type="ambient" color="#ccc"></a-light>
+        <a-light type="directional" position="0 10 0" intensity="0.5"></a-light>
+        
+        <!-- Room structure -->
+        <a-box position="0 2 -21" depth="16" height="4" width="13.5" color="#FFF" material="side:double; opacity:0.9"></a-box>
+        <a-plane position="0 4 -14" rotation="-90 0 0" width="13.5" height="16" color="#FFF"></a-plane>
+        <a-plane position="0 0 -14" rotation="90 0 0" width="13.5" height="16" color="#7BC8A4"></a-plane>
+        
+        <!-- Detailed Door with Frame and Interactive Component -->
+        <a-entity id="door-frame" position="-6.75 1.3 -15" rotation="0 270 0">
+            <a-box position="0 0 0" depth="0.2" height="2.6" width="1.6" color="#333"></a-box>
+            <a-box id="door" class="clickable" position="0 0 -0.1" depth="0.1" height="2.5" width="1.5" color="#686868"
+                   animation__open="property: rotation; to: 0 120 0; startEvents: open; dur: 1000"
+                   animation__close="property: rotation; to: 0 0 0; startEvents: close; dur: 1000"></a-box>
+            <a-cylinder id="door-knob" position="0.6 0.5 0" radius="0.05" height="0.2" color="gold" rotation="90 0 0"
+                        class="clickable"
+                        event-set__mouseenter="_event: mouseenter; color: yellow"
+                        event-set__mouseleave="_event: mouseleave; color: gold"></a-cylinder>
+        </a-entity>
+
+        <!-- Chalkboard at the front of the room -->
+        <a-box position="0 2 -28.3" depth="0.1" height="2" width="5" color="#333"></a-box>
+    </a-scene>
+
+</body>
+</html>

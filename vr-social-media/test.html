@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Three.js Computer</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/TextureLoader.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add orbit controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Add ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        // Add directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Create the monitor
+        const monitorGeometry = new THREE.BoxGeometry(4, 3, 0.2);
+        const monitorMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+        const monitor = new THREE.Mesh(monitorGeometry, monitorMaterial);
+        monitor.position.set(0, 1.5, 0);
+        scene.add(monitor);
+
+        // Create the screen with a texture
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load('https://threejs.org/examples/textures/crate.gif', (texture) => {
+            const screenGeometry = new THREE.BoxGeometry(3.8, 2.8, 0.1);
+            const screenMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+            screen.position.set(0, 1.5, 0.11);
+            scene.add(screen);
+        });
+
+        // Create the keyboard with keys
+        const keyboardGeometry = new THREE.BoxGeometry(3, 0.2, 1);
+        const keyboardMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
+        const keyboard = new THREE.Mesh(keyboardGeometry, keyboardMaterial);
+        keyboard.position.set(0, 0.4, 1.1);
+        scene.add(keyboard);
+
+        for (let i = -1.2; i <= 1.2; i += 0.3) {
+            for (let j = -0.4; j <= 0.4; j += 0.2) {
+                const keyGeometry = new THREE.BoxGeometry(0.25, 0.1, 0.25);
+                const keyMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+                const key = new THREE.Mesh(keyGeometry, keyMaterial);
+                key.position.set(i, 0.45, 1.1 + j);
+                scene.add(key);
+            }
+        }
+
+        // Create the base
+        const baseGeometry = new THREE.BoxGeometry(4, 0.2, 2);
+        const baseMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.set(0, 0.1, 0);
+        scene.add(base);
+
+        // Create a desk lamp
+        const lampBaseGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 32);
+        const lampBaseMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+        const lampBase = new THREE.Mesh(lampBaseGeometry, lampBaseMaterial);
+        lampBase.position.set(-2, 0.4, 2);
+        scene.add(lampBase);
+
+        const lampArmGeometry = new THREE.BoxGeometry(0.1, 0.1, 1.5);
+        const lampArmMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+        const lampArm = new THREE.Mesh(lampArmGeometry, lampArmMaterial);
+        lampArm.position.set(-2, 1.1, 1.25);
+        lampArm.rotation.x = Math.PI / 4;
+        scene.add(lampArm);
+
+        const lampHeadGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+        const lampHeadMaterial = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        const lampHead = new THREE.Mesh(lampHeadGeometry, lampHeadMaterial);
+        lampHead.position.set(-2, 1.5, 0.75);
+        scene.add(lampHead);
+
+        // Add a spotlight for the lamp
+        const lampLight = new THREE.SpotLight(0xffff00, 1);
+        lampLight.position.set(-2, 1.5, 0.75);
+        lampLight.target.position.set(0, 0.4, 0);
+        scene.add(lampLight);
+        scene.add(lampLight.target);
+
+        // Position the camera
+        camera.position.z = 10;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
+
